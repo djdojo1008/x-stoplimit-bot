@@ -106,17 +106,7 @@ def main():
     post_to_x(post)
 
 if __name__ == "__main__":
-    # テスト投稿用：固定メッセージを送る（v2対応）
-    import tweepy
-    client = tweepy.Client(
-        consumer_key=os.environ["TW_API_KEY"],
-        consumer_secret=os.environ["TW_API_SECRET"],
-        access_token=os.environ["TW_ACCESS_TOKEN"],
-        access_token_secret=os.environ["TW_ACCESS_SECRET"]
-    )
-    client.create_tweet(
-        text="✅ テスト投稿です！（自動投稿ボット連携確認） #株式投資 #毎日投稿 #フォロー歓迎"
-    )
+    main()
 
 
 # ===== ここから追記 =====
