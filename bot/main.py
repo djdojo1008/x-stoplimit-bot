@@ -53,9 +53,35 @@ def parse_stops(article_url):
     s_low  = extract("●ストップ安の銘柄一覧")
     return s_high, s_low
 
-def build_post(session_word, s_high, s_low, src_title):
+# 変更前:
+# def build_post(session_word, s_high, s_low, src_title):
+
+# 変更後:
+def build_post(session_word, s_high, s_low, src_title, article_url):
     jst = datetime.timezone(datetime.timedelta(hours=9))
     today_date = datetime.datetime.now(jst).date()
+
+    def fmt(lst):
+        if not lst: return "なし"
+        return " / ".join([f"{c} {n}" for c,n in lst][:10])
+
+    hashtags = " ".join(pick_hashtags(today_date))
+
+    # URL分を確保して本文が途中でURLを切らないようにする
+    MAX_LEN = 270
+    url_line = f"\n詳報: {article_url}"
+    reserve = len(url_line)  # URL行の文字数を確保
+    base = (
+        f"\n"
+        f"S高: {fmt(s_high)}\n"
+        f"S安: {fmt(s_low)}\n"
+        f"出典: 株探（{src_title or '本日のストップ高/安'}）\n"
+        f"{hashtags}"
+    )
+
+    # URL分を残して本文をカット
+    text = base[: max(0, MAX_LEN - reserve)]
+    return text + url_line
 
     def fmt(lst):
         if not lst: return "なし"
@@ -101,7 +127,7 @@ def main():
         print("該当記事が見つかりませんでした。時間をあけて再実行してください。", file=sys.stderr)
         sys.exit(1)
     s_high, s_low = parse_stops(url)
-    post = build_post(SESSION, s_high, s_low, title or "本日のストップ高/安")
+    post = build_post(SESSION, s_high, s_low, title or "本日のストップ高/安", url)
     print(post)  # ログに出す
     post_to_x(post)
 
