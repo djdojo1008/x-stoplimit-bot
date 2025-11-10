@@ -55,7 +55,22 @@ def parse_stops(article_url):
 
 def build_post(session_word, s_high, s_low, src_title):
     jst = datetime.timezone(datetime.timedelta(hours=9))
-    today = datetime.datetime.now(jst).date().isoformat()
+    today_date = datetime.datetime.now(jst).date()
+
+    def fmt(lst):
+        if not lst: return "なし"
+        return " / ".join([f"{c} {n}" for c,n in lst][:10])
+
+    hashtags = " ".join(pick_hashtags(today_date))
+    text = (
+        f"\n"
+        f"S高: {fmt(s_high)}\n"
+        f"S安: {fmt(s_low)}\n"
+        f"出典: 株探（{src_title or '本日のストップ高/安'}）\n"
+        f"{hashtags}"
+    )
+    return text[:270]  # 270文字に収める（余裕を持たせてMAX280文字）
+
 
     def fmt(lst):
         if not lst: return "なし"
