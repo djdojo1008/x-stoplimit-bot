@@ -4,8 +4,8 @@ on:
   schedule:
     # 前場 11:35 JST = 02:35 UTC（平日のみ）
     - cron: "35 2 * * 1-5"
-    # 後場 15:10 JST = 06:10 UTC（平日のみ）
-    - cron: "10 6 * * 1-5"
+    # 後場 15:40 JST = 06:40 UTC（平日のみ）
+    - cron: "40 6 * * 1-5"
   workflow_dispatch: {}
 
 jobs:
@@ -38,7 +38,7 @@ jobs:
 
       # 後場（スケジュールトリガー時のみ）
       - name: 後場ポスト
-        if: ${{ github.event_name == 'schedule' && github.event.schedule == '10 6 * * 1-5' }}
+        if: ${{ github.event_name == 'schedule' && github.event.schedule == '40 6 * * 1-5' }}
         env:
           SESSION: "後場"
           TW_API_KEY: ${{ secrets.TW_API_KEY }}
