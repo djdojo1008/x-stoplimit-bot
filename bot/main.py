@@ -93,3 +93,38 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+# ===== ここから追記 =====
+def pick_hashtags(today):
+    """
+    曜日でタグを自動ローテ（AI系は避ける）
+    月・木: デイトレ/スイング勢
+    火・金: 兼業投資家
+    水: 初心者〜中級者
+    ※ HASHTAG_SET=1/2/3 で強制指定、EXTRA_TAGSで追タグ可（半角スペース区切り）
+    """
+    set1 = ["#株探", "#ストップ高", "#ストップ安", "#デイトレ", "#スイングトレード", "#注目銘柄", "#毎日投稿"]
+    set2 = ["#株探", "#ストップ高", "#ストップ安", "#株式投資", "#投資メモ", "#株ニュース", "#フォロワー募集中"]
+    set3 = ["#株探", "#ストップ高", "#ストップ安", "#株初心者", "#注目銘柄", "#今日の株", "#株クラフォロー歓迎"]
+
+    # 環境変数で強制切替（1/2/3）
+    forced = os.getenv("HASHTAG_SET")
+    if forced in {"1", "2", "3"}:
+        base = {"1": set1, "2": set2, "3": set3}[forced]
+    else:
+        wd = today.weekday()  # Mon=0 ... Sun=6
+        if wd in (0, 3):   # 月・木
+            base = set1
+        elif wd in (1, 4): # 火・金
+            base = set2
+        else:              # 水・土・日（実行は平日のみ想定）
+            base = set3
+
+    extra = (os.getenv("EXTRA_TAGS") or "").strip()
+    if extra:
+        base = base + extra.split()
+
+    # 5〜7個程度に抑える（念のため7個に丸める）
+    return base[:7]
+# ===== 追記ここまで =====
+
