@@ -1,4 +1,3 @@
-
 name: post-stophigh-bot
 
 on:
@@ -12,14 +11,23 @@ on:
 jobs:
   run:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - run: pip install -r requirements.txt
+
+      # 依存ライブラリ（jpholiday含む）をインストール
+      - name: Install Python deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # 前場（スケジュールトリガー時のみ）
       - name: 前場ポスト
-        if: ${{ github.event.schedule == '35 2 * * 1-5' }}
+        if: ${{ github.event_name == 'schedule' && github.event.schedule == '35 2 * * 1-5' }}
         env:
           SESSION: "前場"
           TW_API_KEY: ${{ secrets.TW_API_KEY }}
@@ -27,8 +35,10 @@ jobs:
           TW_ACCESS_TOKEN: ${{ secrets.TW_ACCESS_TOKEN }}
           TW_ACCESS_SECRET: ${{ secrets.TW_ACCESS_SECRET }}
         run: python bot/main.py
+
+      # 後場（スケジュールトリガー時のみ）
       - name: 後場ポスト
-        if: ${{ github.event.schedule == '10 6 * * 1-5' }}
+        if: ${{ github.event_name == 'schedule' && github.event.schedule == '10 6 * * 1-5' }}
         env:
           SESSION: "後場"
           TW_API_KEY: ${{ secrets.TW_API_KEY }}
@@ -37,10 +47,12 @@ jobs:
           TW_ACCESS_SECRET: ${{ secrets.TW_ACCESS_SECRET }}
         run: python bot/main.py
 
-      - name: 手動テスト
+      # 手動テスト（投稿しない／DRY_RUN）
+      - name: 手動テスト（DRY_RUN）
         if: ${{ github.event_name == 'workflow_dispatch' }}
         env:
-          SESSION: "前場"   # ← 好きに「後場」に変えてOK
+          SESSION: "前場"           # 手動で後場テストなら「後場」に変更OK
+          DRY_RUN: "1"              # 投稿せず本文だけ出力
           TW_API_KEY: ${{ secrets.TW_API_KEY }}
           TW_API_SECRET: ${{ secrets.TW_API_SECRET }}
           TW_ACCESS_TOKEN: ${{ secrets.TW_ACCESS_TOKEN }}
