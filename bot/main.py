@@ -107,7 +107,15 @@ def main():
     post_to_x(post)
 
 if __name__ == "__main__":
-    main()
+    # テスト投稿用：固定メッセージを送る
+    import tweepy
+    api_key = os.environ["TW_API_KEY"]
+    api_secret = os.environ["TW_API_SECRET"]
+    access_token = os.environ["TW_ACCESS_TOKEN"]
+    access_secret = os.environ["TW_ACCESS_SECRET"]
+    auth = tweepy.OAuth1UserHandler(api_key, api_secret, access_token, access_secret)
+    api = tweepy.API(auth)
+    api.update_status("✅ テスト投稿です！（自動投稿ボット連携確認） #株式投資 #毎日投稿 #フォロー歓迎")
 
 # ===== ここから追記 =====
 def pick_hashtags(today):
