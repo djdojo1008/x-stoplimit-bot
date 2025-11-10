@@ -1,0 +1,38 @@
+
+name: post-stophigh-bot
+
+on:
+  schedule:
+    # 前場 11:35 JST = 02:35 UTC（平日のみ）
+    - cron: "35 2 * * 1-5"
+    # 後場 15:10 JST = 06:10 UTC（平日のみ）
+    - cron: "10 6 * * 1-5"
+  workflow_dispatch: {}
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -r requirements.txt
+      - name: 前場ポスト
+        if: ${{ github.event.schedule == '35 2 * * 1-5' }}
+        env:
+          SESSION: "前場"
+          TW_API_KEY: ${{ secrets.TW_API_KEY }}
+          TW_API_SECRET: ${{ secrets.TW_API_SECRET }}
+          TW_ACCESS_TOKEN: ${{ secrets.TW_ACCESS_TOKEN }}
+          TW_ACCESS_SECRET: ${{ secrets.TW_ACCESS_SECRET }}
+        run: python bot/main.py
+      - name: 後場ポスト
+        if: ${{ github.event.schedule == '10 6 * * 1-5' }}
+        env:
+          SESSION: "後場"
+          TW_API_KEY: ${{ secrets.TW_API_KEY }}
+          TW_API_SECRET: ${{ secrets.TW_API_SECRET }}
+          TW_ACCESS_TOKEN: ${{ secrets.TW_ACCESS_TOKEN }}
+          TW_ACCESS_SECRET: ${{ secrets.TW_ACCESS_SECRET }}
+        run: python bot/main.py
